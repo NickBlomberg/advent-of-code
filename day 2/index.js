@@ -17,8 +17,16 @@ let lines = fs
   .filter(line => line != '')
 
 let validGames = []
+let cubePowers = []
+
 lines.forEach(line => {
   const gameId = Number(line.match(/^Game (\d+)/i)[1])
+
+  let minCubes = {
+    red: 1,
+    green: 1,
+    blue: 1,
+  }
 
   const sets = line
     .split(':')[1]
@@ -33,15 +41,24 @@ lines.forEach(line => {
 
       const [, count, color] = setParts[i].match(regex)
 
-      if (count > colorMap[color]) return false
+      if (count > minCubes[color]) minCubes[color] = Number(count)
+
+      if (count > colorMap[color]) isValid = false
     }
 
     return isValid
   }, true)
 
   if (isValidGame) validGames.push(gameId)
+
+  cubePowers.push(minCubes['red'] * minCubes['green'] * minCubes['blue'])
 })
 
-const sumOfValidGames = validGames.reduce((sum, gameId) => sum + gameId)
+const sumOfValidGames = validGames.reduce((sum, gameId) => sum + gameId, 0)
 
-console.log({ validGames, sumOfValidGames })
+const sumOfCubePowers = cubePowers.reduce(
+  (sum, cubePower) => sum + cubePower,
+  0,
+)
+
+console.log({ validGames, sumOfValidGames, sumOfCubePowers })
